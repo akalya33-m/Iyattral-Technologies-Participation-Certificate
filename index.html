@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <!-- Optimized viewport meta for perfectly scaling mobile layout widths -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Iyattral Technologies</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f7fb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 440px;
+      background: white;
+      padding: 35px 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: #111;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 25px;
+    }
+    p {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.5;
+    }
+    .review-button {
+      width: 100%;
+      padding: 16px;
+      background: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+      box-sizing: border-box;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+      -webkit-tap-highlight-color: transparent; /* Fixes blue flashing on iOS tap */
+    }
+    .review-button:active { opacity: 0.9; }
+
+    /* Disabled State Styling */
+    .continue-button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 15px;
+      background: #e0e0e0;
+      color: #888;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: not-allowed;
+      display: block;
+      text-decoration: none;
+      box-sizing: border-box;
+      text-align: center;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Unlocked Active State Styling */
+    .continue-button.enabled {
+      background: #1a73e8;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
+    }
+    .continue-button.enabled:active {
+      background: #1557b0;
+    }
+    
+    .message {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #cc0000;
+      line-height: 1.5;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .message.success {
+      color: #008800;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">IYATTRAL</div>
+    <div class="subtitle">Please Review Us ⭐</div>
+
+    <p>Thank you for participating in our program!</p>
+    <p>We would love to hear your honest feedback about your experience.</p>
+
+    <!-- GOOGLE REVIEW BUTTON -->
+    <a 
+      href="https://share.google/fUaPNbKPTClo3XRJM" 
+      target="_blank" 
+      class="review-button" 
+      onclick="registerReviewClick()">
+      ⭐ GOOGLE REVIEW
+    </a>
+
+    <!-- CONTINUE BUTTON (Controlled via JavaScript Click Handling) -->
+    <a 
+      id="continueButton" 
+      href="#" 
+      class="continue-button" 
+      onclick="handleContinueClick(event)">
+      CONTINUE →
+    </a>
+
+    <div id="message" class="message">
+      🔒 Continue button unlocks only AFTER you review.
+    </div>
+  </div>
+
+  <script>
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdZfDIGXf1u2uXfCf1Z6iFrsfHeVtM2dxp30RjzWjikftRaKQ/viewform";
+    let isUnlocked = false;
+    
+    // Check local storage state on load
+    if (localStorage.getItem("hasVisitedReview") === "true") {
+      unlockForm();
+    }
+
+    function registerReviewClick() {
+      localStorage.setItem("clickedReviewLink", "true");
+    }
+
+    function handleVisibilityChange() {
+      const clickedLink = localStorage.getItem("clickedReviewLink") === "true";
+      if ((document.visibilityState === "visible" || document.hasFocus()) && clickedLink) {
+        localStorage.setItem("hasVisitedReview", "true");
+        unlockForm();
+      }
+    }
+
+    // Mobile-specific layout listeners
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleVisibilityChange); 
+
+    function unlockForm() {
+      isUnlocked = true;
+      const btn = document.getElementById("continueButton");
+      btn.classList.add("enabled");
+
+      const msg = document.getElementById("message");
+      msg.innerText = "✅ Thank you! You can now proceed to the form.";
+      msg.className = "message success";
+    }
+
+    // Handles the responsive routing logic seamlessly for iOS and Android
+    function handleContinueClick(event) {
+      event.preventDefault(); // Stop default anchor tags instantly
+      
+      if (!isUnlocked) {
+        alert("Please complete Step 1 by clicking the Google Review button first!");
+        return;
+      }
+
+      /* 
+        CRITICAL FIX FOR THE MULTI-ACCOUNT GLITCH:
+        Instead of loading inside the app frame or using target="_top" which locks cookies,
+        we invoke a top-level window dispatch tool. This causes the mobile phone to
+        launch the Google Form cleanly inside the user's primary mobile browser app.
+      */
+      window.open(GOOGLE_FORM_URL, '_blank');
+    }
+  </script>
+
+</body>
+</html>
